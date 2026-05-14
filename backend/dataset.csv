@@ -1,0 +1,36 @@
+question,intent,answer
+hi,greeting,"Hello 👋 Welcome to Sri Lanka Railway Chatbot 🚆"
+hello,greeting,"Hello 👋 How can I help you with train information?"
+hey,greeting,"Hi there! Ask me about trains, fares or schedules 🚆"
+
+colombo to kandy trains,train_search,"Trains from Colombo to Kandy: Dunhinda Odyssey (05:30 - 08:15), Podi Menike (05:55 - 08:45), Udarata Menike (08:30 - 11:15)"
+available trains from colombo to kandy,train_search,"Dunhinda Odyssey, Podi Menike and Udarata Menike are available from Colombo to Kandy"
+
+train from colombo to galle,train_search,"Southern Express runs from Colombo to Galle (14:40 - 16:55)"
+colombo to matara train,train_search,"Southern Express runs Colombo to Matara (arrival around 18:00)"
+
+ticket price colombo to kandy,fare_query,"Colombo to Kandy: 1st Class 2000 LKR, 2nd Class 1200 LKR, 3rd Class 900 LKR"
+colombo to badulla ticket price,fare_query,"Colombo to Badulla: 1st Class 3500 LKR, 2nd Class 2500 LKR, 3rd Class 1800 LKR"
+
+ticket price colombo to galle,fare_query,"Colombo to Galle: 1st Class 1100 LKR, 2nd Class 500 LKR, 3rd Class 240 LKR"
+
+train schedule dunhinda odyssey,schedule_query,"Dunhinda Odyssey departs Colombo at 05:30 and reaches Kandy at 08:15"
+dunhinda odyssey stops,schedule_query,"Stops: Colombo, Kandy, Hatton, Nanu Oya, Haputale, Ella, Badulla"
+
+kandy station info,station_info,"Kandy is located in Central Province, 121 km from Colombo Fort"
+
+where is ella station,station_info,"Ella is a scenic mountain station located 271 km from Colombo"
+
+terms cancellation,cancellation_policy,"Refund: 75% before 7 days, 50% within 48 hours, no refund after 48 hours"
+
+child policy,terms,"Children under 3 years travel free if sharing seat with parents"
+
+luggage rules,luggage,"First Class 40kg, Second Class 35kg, Third Class 25kg free luggage allowed"
+
+pets allowed,pets,"No pets are allowed in Sri Lanka Railways trains"
+
+book train ticket,booking,"You can book tickets via Sri Lanka Railways online system or station counters"
+
+good morning,greeting,"Good morning 🌞 How can I help you today?"
+
+bye,goodbye,"Goodbye 👋 Have a safe journey with Sri Lanka Railways 🚆"

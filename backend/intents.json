@@ -1,0 +1,170 @@
+{
+  "intents": [
+    {
+      "intent": "greeting",
+      "patterns": [
+        "hi", "hello", "hey", "good morning", "good afternoon", "good evening",
+        "greetings", "howdy", "what's up", "namaste", "welcome",
+        "hola", "bonjour", "hi there", "hello there"
+      ],
+      "responses": [
+        "Hello! Welcome to Sri Lanka Railway Chatbot 🚆",
+        "Hi there! How can I help you with railway services?",
+        "Welcome! Ask me about trains, fares, or booking 🚆"
+      ]
+    },
+
+    {
+      "intent": "goodbye",
+      "patterns": [
+        "bye", "goodbye", "see you", "thanks", "thank you", "exit", "quit",
+        "see you later", "farewell", "catch you", "take care", "cheers",
+        "gotta go", "bye bye", "later", "cya","ok","OK","Ok"
+      ],
+      "responses": [
+        "Goodbye! Have a safe journey with Sri Lanka Railways 🚆",
+        "Thank you! Enjoy your train ride!",
+        "Safe travels! Goodbye 👋"
+      ]
+    },
+
+    {
+      "intent": "booking",
+      "patterns": [
+        "book ticket", "reserve ticket", "book train", "i want to book a train",
+        "make reservation", "ticket booking", "buy ticket", "how to book ticket",
+        "i need to book", "can i book", "book seats", "reserve seats",
+        "i like to book", "please book", "booking for", "reserve for"
+      ],
+      "responses": [
+        "I can help you book a ticket! Please tell me your destination station.",
+        "Sure! What is your destination?",
+        "Please provide the station you want to travel to."
+      ]
+    },
+
+    {
+      "intent": "train_search",
+      "patterns": [
+        "colombo to kandy", "colombo to matale", "colombo to jaffna",
+        "kandy to colombo", "matara to colombo", "galle to colombo",
+        "ella to colombo", "badulla to colombo", "jaffna to colombo",
+        "train from colombo", "train to kandy", "train schedule",
+        "available trains", "railway timetable", "train timing",
+        "what trains go to galle", "trains to matara",
+        "colombo fort to matale", "maradana to matale",
+        "which trains", "show me trains", "list trains",
+        "baticaloa trains", "trincomalee trains", "anuradhapura trains",
+        "colombo to chillaw"
+      ],
+      "responses": [
+        "Let me find the available trains for you.",
+        "I'll search for trains on that route.",
+        "Checking available trains..."
+      ]
+    },
+
+    {
+      "intent": "fare_query",
+      "patterns": [
+        "ticket price", "fare", "train ticket price", "how much ticket",
+        "ticket cost", "price list", "colombo to kandy price",
+        "colombo to matale price", "ticket charges", "cost of ticket",
+        "price of ticket", "how much", "what is the fare",
+        "ticket rates", "current fare", "fare information", "price check",
+        "how much does it cost", "what price"
+      ],
+      "responses": [
+        "Let me check the fare for you.",
+        "I'll find the ticket price information.",
+        "Checking fare information..."
+      ]
+    },
+
+    {
+      "intent": "schedule_query",
+      "patterns": [
+        "schedule", "departure time", "arrival time", "train time",
+        "timetable", "when does train leave", "what time train",
+        "train timing", "departure", "arrival", "what time does",
+        "when does", "schedule information", "time table", "train times",
+        "daily schedule", "weekly schedule", "running days"
+      ],
+      "responses": [
+        "Let me find the schedule for you.",
+        "I'll check the train timings.",
+        "Fetching schedule details..."
+      ]
+    },
+
+    {
+      "intent": "station_info",
+      "patterns": [
+        "station", "stations", "where is colombo fort", "kandy station",
+        "galle station", "matale station", "railway station info",
+        "distance from colombo", "nearest station", "how far",
+        "station location", "station details", "station information",
+        "distance to", "how many km", "kilometers from colombo",
+        "station address", "all stations", "list of stations"
+      ],
+      "responses": [
+        "Let me search for station information.",
+        "I'll find the station details for you.",
+        "Searching station information..."
+      ]
+    },
+
+    {
+      "intent": "terms_policy",
+      "patterns": [
+        "terms", "policy", "rules", "refund", "cancellation",
+        "luggage", "pets allowed", "railway rules", "booking rules",
+        "refund policy", "cancellation policy", "luggage allowance",
+        "pet policy", "baggage", "terms and conditions",
+        "can i bring", "are pets allowed", "what can i carry",
+        "dangerous goods", "child policy", "ticket validity",
+        "payment methods", "maximum reservation", "nic requirement","ticket usage"
+      ],
+      "responses": [
+        "Let me find the railway policy for you.",
+        "I'll retrieve the terms and conditions.",
+        "Fetching policy information..."
+      ]
+    },
+
+    {
+      "intent": "help",
+      "patterns": [
+        "help", "assist", "support", "can you help", "i need help",
+        "what can you do", "how can you help", "what services",
+        "command", "available commands", "what options", "features"
+      ],
+      "responses": [
+        "I can help you with train bookings, fares, schedules, and railway policies.",
+        "I'm here to assist with railway information and bookings."
+      ]
+    },
+
+    {
+      "intent": "contact",
+      "patterns": [
+        "contact", "phone", "number", "email", "address",
+        "how to contact", "customer service", "support number",
+        "railway office", "call", "reach out", "complaint"
+      ],
+      "responses": [
+        "You can contact Sri Lanka Railways at +94-11-2325-800 or visit www.railway.gov.lk"
+      ]
+    },
+
+    {
+      "intent": "unknown",
+      "patterns": [
+        "unclear", "confused", "don't know", "not sure"
+      ],
+      "responses": [
+        "I'm not sure I understand. Could you please rephrase?"
+      ]
+    }
+  ]
+}
