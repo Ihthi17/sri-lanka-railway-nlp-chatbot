@@ -12,6 +12,7 @@ from sqlalchemy import text, create_engine
 from sqlalchemy.orm import sessionmaker
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from datetime import datetime, timedelta
 
 
 # ============================================
@@ -149,10 +150,26 @@ def predict_intent(message):
 
     # SCHEDULE QUERY
     schedule_keywords = [
-        "schedule", "timetable", "departure", "arrival", "time",
-        "available tomorrow", "tomorrow train", "tomorrow",
-        "next day", "today train", "today", "available now"
-    ]
+    "schedule", "timetable", "departure", "arrival", "time",
+
+    "today",
+    "tomorrow",
+
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+    "Tue,Fri,Sun",
+
+    "today train",
+    "tomorrow train",
+    "available trains",
+    "available now",
+    "train schedule"
+]
     if any(word in msg for word in schedule_keywords):
         return "schedule_query"
     
@@ -276,6 +293,7 @@ STATIONS = load_stations()
 def extract_day(message):
     msg = message.lower()
 
+    # Detect direct day names
     days = {
         "monday": "Monday",
         "tuesday": "Tuesday",
@@ -284,13 +302,21 @@ def extract_day(message):
         "friday": "Friday",
         "saturday": "Saturday",
         "sunday": "Sunday",
-        "daily": "Daily",
-        "today": "today"
+        "daily": "Daily"
     }
 
     for key, value in days.items():
         if key in msg:
             return value
+
+    # TODAY
+    if "today" in msg:
+        return datetime.now().strftime("%A")
+
+    # TOMORROW
+    if "tomorrow" in msg:
+        tomorrow = datetime.now() + timedelta(days=1)
+        return tomorrow.strftime("%A")
 
     return None
 
@@ -501,7 +527,7 @@ def get_train_schedule(from_station, to_station):
         else:
             return {
                 "status": "not_found",
-                "message": f"❌ No trains found between {from_station} and {to_station}.\n📞 Please contact the Railway Department for more information."
+                "message": f"❌ No trains found between {from_station} and {to_station}.\n📞 Please contact the Railway Department for more information. +94-11-2325-800"
             }
 
     except Exception as e:
@@ -577,7 +603,7 @@ def get_station_info(station_name):
     db = SessionLocal()
     try:
         query = text("""
-            SELECT station_name, distance_from_colombo
+            SELECT station_name, distance_from_colombo, Telephone_no
             FROM stations
             WHERE station_name = :station_name
             LIMIT 1
@@ -589,11 +615,12 @@ def get_station_info(station_name):
         ).fetchone()
 
         if result:
-            return {
-                "status": "success",
-                "station": result[0],
-                "distance": float(result[1]) if result[1] else "N/A"
-            }
+                    return {
+            "status": "success",
+            "station": result[0],
+            "distance": float(result[1]) if result[1] else "N/A",
+            "Telephone_no": result[2] if result[2] else "Not Available"
+        }
         else:
             return {
                 "status": "not_found",
@@ -846,6 +873,7 @@ def format_station_info(data):
 
 **Station:** {data['station']}
 **Distance from Colombo Fort:** {data['distance']} km
+** Phone Number :**{data['Telephone_no']}
 
 📞 For more details: +94-11-2325-800"""
     return response
@@ -898,25 +926,76 @@ def search_trains(day=None, from_station=None):
 
         params = {}
 
-        # Filter by day
-        if day and day.lower() != "today":
+        # ============================================
+        # FILTER BY DAY
+        # ============================================
 
+        if day:
+
+             # Convert full weekday -> DB format
+            day_map = {
+                    "Monday": "Mon",
+                    "Tuesday": "Tue",
+                    "Wednesday": "Wed",
+                    "Thursday": "Thu",
+                    "Friday": "Fri",
+                    "Saturday": "Sat",
+                    "Sunday": "Sun"
+                }
+
+
+            # Daily trains
             if day.lower() == "daily":
-                base_query += " AND ts.running_days LIKE :day"
+
+                base_query += """
+                    AND ts.running_days LIKE :day
+                """
+
                 params["day"] = "%Daily%"
 
             else:
-                base_query += " AND ts.running_days LIKE :day"
-                params["day"] = f"%{day}%"
 
-        # Filter by station
+                db_day = day_map.get(day, day)
+
+
+                # Include selected day + daily trains
+                base_query += """
+                    AND (
+                        ts.running_days LIKE :day
+                        OR ts.running_days LIKE '%Daily%'
+                    )
+                """
+
+                params["day"] = f"%{db_day}%"
+
+        # ============================================
+        # FILTER BY STATION
+        # ============================================
+
         if from_station:
-            base_query += " AND s.station_name = :station"
+
+            base_query += """
+                AND s.station_name = :station
+            """
+
             params["station"] = from_station
 
-        base_query += " ORDER BY ts.departure_time"
+        # ============================================
+        # ORDER RESULTS
+        # ============================================
 
-        results = db.execute(text(base_query), params).fetchall()
+        base_query += """
+            ORDER BY ts.departure_time
+        """
+
+        results = db.execute(
+            text(base_query),
+            params
+        ).fetchall()
+
+        # ============================================
+        # RESULTS FOUND
+        # ============================================
 
         if results:
 
@@ -933,12 +1012,17 @@ def search_trains(day=None, from_station=None):
                 ]
             }
 
+        # ============================================
+        # NO RESULTS
+        # ============================================
+
         return {
             "status": "not_found",
             "message": "No trains found"
         }
 
     except Exception as e:
+
         print("Train search error:", e)
 
         return {
@@ -947,6 +1031,7 @@ def search_trains(day=None, from_station=None):
         }
 
     finally:
+
         db.close()
 
 
@@ -1001,13 +1086,13 @@ What can I help you with today?"""
         return """📞 **Sri Lanka Railway Department Contact**
 
 🏢 **Headquarters:** Colombo Fort Railway Station
-📱 **Hotline:** +94-11-2325-800
+📱 **Hotline:** +94 11 4 600 111
 📧 **Email:** info@railway.gov.lk
 🌐 **Website:** www.railway.gov.lk
 
 ⏰ **Operating Hours:** 24/7 Customer Support
 
-For emergencies, dial 119."""
+For emergencies, dial 1971."""
 
     # CANCEL TICKET / REFUND
     if intent == "cancel_ticket":
@@ -1028,7 +1113,7 @@ For emergencies, dial 119."""
 
 """
         
-        response += "\n📞 To cancel: Contact +94-11-2325-800 or visit www.railway.gov.lk"
+        response += "\n📞 To cancel: Contact +94 11 4 600 111 or visit www.railway.gov.lk"
         return response
 
     # ADDITIONAL CHARGES (LUGGAGE)
@@ -1074,7 +1159,7 @@ Next steps:
 2️⃣ Check **schedule** - Say: "train schedule"
 3️⃣ **Complete booking** at www.railway.gov.lk
 
-📞 Need help? Call: +94-11-2325-800"""
+📞 Need help? Call: +94 11 4 600 111"""
 
     # FARE QUERY
     if intent == "fare_query":
