@@ -129,43 +129,28 @@ def predict_intent(message):
     if any(word in msg for word in fare_keywords):
         return "fare_query"
 
-    # SCHEDULE QUERY
-    schedule_keywords = [
-    "schedule", "timetable", "departure", "arrival", "time",
-
-    "today",
-    "tomorrow",
-
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-    "sunday",
-    "Tue,Fri,Sun",
-
-    "today train",
-    "tomorrow train",
-    "available trains",
-    "available now",
-    "train schedule"
-]
-    if any(word in msg for word in schedule_keywords):
-        return "schedule_query"
-    
-
-     # ALL TRAIN SCHEDULE REQUEST (HIGHEST PRIORITY)
+    # ALL TRAIN SCHEDULE REQUEST (HIGHEST PRIORITY)
     all_schedule_keywords = [
         "all schedule", "all schedules", "full schedule",
         "today all trains", "all train schedule",
         "train list today", "today schedule", "daily schedule",
         "show all trains", "all trains today",
-        "give me today all train schedules"
+        "give me today all train schedules",
+        "give me the today train schedule"
     ]
 
     if any(word in msg for word in all_schedule_keywords):
         return "all_schedule"
+
+    # SCHEDULE QUERY
+    schedule_keywords = [
+        "schedule", "timetable", "departure", "arrival", "time",
+        "today", "tomorrow", "monday", "tuesday", "wednesday",
+        "thursday", "friday", "saturday", "sunday"
+    ]
+    if any(word in msg for word in schedule_keywords):
+        return "schedule_query"
+
 
     # TRAIN SEARCH
     train_keywords = [
@@ -264,7 +249,44 @@ def load_stations():
         db.close()
 
 
+def get_stations():
+    """Dynamically get stations or return cached version"""
+    global STATIONS
+    if not STATIONS:
+        STATIONS = load_stations()
+    return STATIONS
+
 STATIONS = load_stations()
+
+def normalize_station(station_name):
+    if not station_name:
+        return None
+
+    station_lower = station_name.lower().strip()
+    stations_data = get_stations()
+
+    # direct match
+    for key, value in stations_data.items():
+        if station_lower == key:
+            return value["name"]
+
+    # partial match (Only for longer words to avoid false positives)
+    if len(station_lower) > 3:
+        for key, value in stations_data.items():
+            if station_lower == key or key == station_lower:
+                return value["name"]
+
+    # Colombo special handling
+    if "colombo" in station_lower:
+        return "Colombo Fort"
+
+    # fuzzy match fallback
+    matches = difflib.get_close_matches(station_lower, stations_data.keys(), n=1, cutoff=0.7)
+    if matches:
+        return stations_data[matches[0]]["name"]
+
+    return None
+
 
 
 # ============================================
@@ -1061,6 +1083,15 @@ What can I help you with today?"""
     # GOODBYE
     if intent == "goodbye":
         return "👋 Thank you for using Sri Lanka Railway Chatbot! Have a safe journey 🚆"
+
+    # ALL SCHEDULE
+    if intent == "all_schedule":
+        day = datetime.now().strftime("%A")
+        dynamic_data = search_trains(day=day)
+        if dynamic_data["status"] == "success":
+            return format_dynamic_train_response(dynamic_data, day=day)
+        return "❌ No trains found for today. Please check the official website for full timetable."
+
 
     # RAILWAY CONTACT
     if intent == "railway_contact":

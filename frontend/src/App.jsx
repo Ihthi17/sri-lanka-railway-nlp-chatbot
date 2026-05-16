@@ -2,7 +2,9 @@ import { useState } from "react";
 import { SendHorizontal, TrainFront, User } from "lucide-react"; // Added User icon
 
 function App() {
+  const [userId] = useState("user_" + Math.random().toString(36).substring(7));
   const [message, setMessage] = useState("");
+
   const [messages, setMessages] = useState([
     {
       sender: "bot",
@@ -21,8 +23,9 @@ function App() {
       const response = await fetch("https://sri-lanka-railway-nlp-chatbot-production.up.railway.app/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: message })
+        body: JSON.stringify({ message: message, user_id: userId })
       });
+
 
       const data = await response.json();
       const botMessage = { sender: "bot", text: data.response };
