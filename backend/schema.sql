@@ -343,5 +343,18 @@ ALTER TABLE `trains`
 ALTER TABLE `train_schedules`
   ADD CONSTRAINT `train_schedules_ibfk_1` FOREIGN KEY (`train_id`) REFERENCES `trains` (`train_id`),
   ADD CONSTRAINT `train_schedules_ibfk_2` FOREIGN KEY (`station_id`) REFERENCES `stations` (`station_id`);
+--
+-- Table structure for table `unknown_questions`
+--
+
+DROP TABLE IF EXISTS `unknown_questions`;
+CREATE TABLE `unknown_questions` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `question` text NOT NULL,
+  `user_id` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 COMMIT;
+
 

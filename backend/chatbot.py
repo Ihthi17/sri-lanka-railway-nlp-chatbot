@@ -43,9 +43,17 @@ for intent in intents_data.get("intents", []):
         patterns.append(pattern.lower())
         tags.append(intent.get("intent", "unknown"))
 
-# Initialize TF-IDF vectorizer
-vectorizer = TfidfVectorizer(lowercase=True, analyzer='char', ngram_range=(2, 3))
+# Initialize TF-IDF vectorizer with better parameters for intent matching
+vectorizer = TfidfVectorizer(
+    lowercase=True, 
+    analyzer='char', 
+    ngram_range=(2, 4), 
+    use_idf=True, 
+    smooth_idf=True,
+    sublinear_tf=True
+)
 X = vectorizer.fit_transform(patterns) if patterns else None
+
 
 def contains_word(msg, word):
     return re.search(rf"\b{re.escape(word)}\b", msg) is not None
@@ -474,6 +482,26 @@ def get_fares(from_station, to_station):
         }
     finally:
         db.close()
+
+def save_unknown_question(question, user_id=None):
+    """Save questions that the chatbot couldn't answer for admin review"""
+    if not DB_CONNECTED or SessionLocal is None:
+        return
+
+    db = SessionLocal()
+    try:
+        query = text("""
+            INSERT INTO unknown_questions (question, user_id)
+            VALUES (:question, :user_id)
+        """)
+        db.execute(query, {"question": question, "user_id": user_id})
+        db.commit()
+        print(f"Logged unknown question: {question}")
+    except Exception as e:
+        print(f"Error logging unknown question: {e}")
+    finally:
+        db.close()
+
 
 
         
@@ -1298,7 +1326,9 @@ Try:
             return format_station_info(station_data)
 
     # UNKNOWN INTENT
+    save_unknown_question(message, user_id=user_id)
     return """❓ I'm not sure I understood that.
+
 
 I can help you with:
 • 🚆 **Train schedules** - "Colombo to Kandy"
