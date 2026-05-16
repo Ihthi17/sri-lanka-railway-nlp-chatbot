@@ -28,14 +28,15 @@ def home():
 
 class ChatRequest(BaseModel):
     message: str
+    user_id: str = "default_user"
 
 # Chat API
 
 @app.post("/chat")
 def chat(request: ChatRequest):
 
-    response = get_response(request.message)
+    response = get_response(request.message, user_id=request.user_id)
 
     return {
         "response": response
-    }
+    }
