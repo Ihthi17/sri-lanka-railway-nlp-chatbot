@@ -136,7 +136,9 @@ def predict_intent(message):
         "train list today", "today schedule", "daily schedule",
         "show all trains", "all trains today",
         "give me today all train schedules",
-        "give me the today train schedule"
+        "give me the today train schedule",
+        "trains from", "trains available from", "trains available in",
+        "trains avilable", "available trains"
     ]
 
     if any(word in msg for word in all_schedule_keywords):
@@ -146,17 +148,18 @@ def predict_intent(message):
     schedule_keywords = [
         "schedule", "timetable", "departure", "arrival", "time",
         "today", "tomorrow", "monday", "tuesday", "wednesday",
-        "thursday", "friday", "saturday", "sunday"
+        "thursday", "friday", "saturday", "sunday",
+        "train schedule", "train time", "train timing"
     ]
     if any(word in msg for word in schedule_keywords):
         return "schedule_query"
 
-
     # TRAIN SEARCH
     train_keywords = [
         "available trains", "what trains", "train available",
-        "all trains", "list trains", "show trains"
+        "all trains", "list trains", "show trains", "trains avilable"
     ]
+
     if any(word in msg for word in train_keywords):
         return "train_search"
 
@@ -1087,10 +1090,13 @@ What can I help you with today?"""
     # ALL SCHEDULE
     if intent == "all_schedule":
         day = datetime.now().strftime("%A")
-        dynamic_data = search_trains(day=day)
+        station = extract_single_station(msg)
+        dynamic_data = search_trains(day=day, from_station=station)
+        
         if dynamic_data["status"] == "success":
-            return format_dynamic_train_response(dynamic_data, day=day)
-        return "❌ No trains found for today. Please check the official website for full timetable."
+            return format_dynamic_train_response(dynamic_data, day=day, station=station)
+        return f"❌ No trains found for {station or 'today'}. Please check the official website for full timetable."
+
 
 
     # RAILWAY CONTACT
