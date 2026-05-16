@@ -8,31 +8,11 @@ import json
 import difflib
 import numpy as np
 from datetime import datetime
-from sqlalchemy import text, create_engine
-from sqlalchemy.orm import sessionmaker
+from database import SessionLocal, DB_CONNECTED, engine
+from sqlalchemy import text
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime, timedelta
-
-
-# ============================================
-# DATABASE CONFIGURATION
-# ============================================
-
-DATABASE_URL = "mysql+pymysql://root:@localhost/train_chatbot"
-
-try:
-    engine = create_engine(DATABASE_URL)
-    SessionLocal = sessionmaker(bind=engine)
-    # Test connection
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
-    DB_CONNECTED = True
-    print("✅ Database connected successfully")
-except Exception as e:
-    print(f"⚠️  Database connection failed: {e}")
-    DB_CONNECTED = False
-    SessionLocal = None
 
 
 # ============================================
@@ -45,11 +25,12 @@ def load_intents():
         with open("intents.json", "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        print("⚠️  intent.json not found. Using basic intents.")
+        print("intent.json not found. Using basic intents.")
         return {"intents": []}
     except json.JSONDecodeError:
-        print("⚠️  intent.json is malformed. Using basic intents.")
+        print("intent.json is malformed. Using basic intents.")
         return {"intents": []}
+
 
 
 intents_data = load_intents()
@@ -256,7 +237,7 @@ def predict_intent(message):
         if similarities[max_idx] > 0.40:
             return tags[max_idx]
     except Exception as e:
-        print(f"⚠️ Intent prediction error: {e}")
+        print(f"Intent prediction error: {e}")
 
     return "unknown"
 
@@ -277,7 +258,7 @@ def load_stations():
         ).fetchall()
         return {r[1].lower(): {"name": r[1], "id": r[0], "distance": r[2]} for r in rows}
     except Exception as e:
-        print(f"⚠️  Error loading stations: {e}")
+        print(f"Error loading stations: {e}")
         return {}
     finally:
         db.close()
@@ -461,7 +442,7 @@ def get_fares(from_station, to_station):
             }
 
     except Exception as e:
-        print(f"⚠️  Database error in get_fares: {e}")
+        print(f"Database error in get_fares: {e}")
         return {
             "status": "error",
             "message": "🔧 Error retrieving fare information. Please contact the Railway Department: +94-11-2325-800"
@@ -531,7 +512,7 @@ def get_train_schedule(from_station, to_station):
             }
 
     except Exception as e:
-        print(f"⚠️  Database error in get_train_schedule: {e}")
+        print(f"Database error in get_train_schedule: {e}")
         return {
             "status": "error",
             "message": "🔧 Error retrieving schedule. Please contact the Railway Department: +94-11-2325-800"
@@ -583,7 +564,7 @@ def get_all_trains():
             return {"status": "not_found", "message": "No trains found."}
 
     except Exception as e:
-        print(f"⚠️  Database error in get_all_trains: {e}")
+        print(f"Database error in get_all_trains: {e}")
         return {
             "status": "error",
             "message": "Error retrieving train information."
@@ -628,7 +609,7 @@ def get_station_info(station_name):
             }
 
     except Exception as e:
-        print(f"⚠️  Database error in get_station_info: {e}")
+        print(f"Database error in get_station_info: {e}")
         return {"status": "error", "message": "Error retrieving station information."}
     finally:
         db.close()
@@ -665,7 +646,7 @@ def get_terms_conditions(category=None):
             }
         return {"status": "not_found", "message": "❌ Terms and conditions not found."}
     except Exception as e:
-        print(f"⚠️ Error: {e}")
+        print(f"Error: {e}")
         return {"status": "error", "message": "Error retrieving terms."}
     finally:
         db.close()
@@ -706,7 +687,7 @@ def get_policy_by_keyword(search_query):
             }
         return {"status": "not_found"}
     except Exception as e:
-        print(f"⚠️ Database error: {e}")
+        print(f"Database error: {e}")
         return {"status": "error"}
     finally:
         db.close()
@@ -751,7 +732,7 @@ def get_additional_charges():
             }
 
     except Exception as e:
-        print(f"⚠️  Database error in get_additional_charges: {e}")
+        print(f"Database error in get_additional_charges: {e}")
         return {
             "status": "error",
             "message": "Error retrieving additional charges."
@@ -1297,11 +1278,11 @@ What would you like to know?"""
 # ============================================
 
 if __name__ == "__main__":
-    print("🚆 Sri Lanka Railway Chatbot Started")
+    print("Sri Lanka Railway Chatbot Started")
     print("=" * 50)
     
     if not DB_CONNECTED:
-        print("⚠️  WARNING: Database not connected!")
+        print("WARNING: Database not connected!")
         print("Some features may not work properly.\n")
     
     while True:
@@ -1311,7 +1292,7 @@ if __name__ == "__main__":
             continue
             
         if user_input.lower() in ["exit", "quit", "bye"]:
-            print("\n👋 Thank you for using Sri Lanka Railway Chatbot!")
+            print("\nThank you for using Sri Lanka Railway Chatbot!")
             break
         
         response = get_response(user_input)
